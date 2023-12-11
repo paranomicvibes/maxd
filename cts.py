@@ -6,8 +6,8 @@ import time
 from cryptography.fernet import Fernet
 
 # Replace these placeholders with actual values during activation
-UID = '<UID>'
-SERVER_IP = '<SERVER_IP>'
+UID = '<UID>'  # Replace with the actual UID
+SERVER_IP = '<SERVER_IP>'  # Replace with the actual server IP
 ENCRYPTION_KEY = b'<ENCRYPTION_KEY>'
 
 def encrypt_message(message):
