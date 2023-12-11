@@ -1,5 +1,4 @@
 import os
-import subprocess
 from cryptography.fernet import Fernet
 
 DETAILS_FILE_PATH = 'server_details.txt'
@@ -10,20 +9,13 @@ def generate_encryption_key():
     return key
 
 def get_local_ip():
-    try:
-        result = subprocess.run(['ifconfig'], stdout=subprocess.PIPE, text=True)
-        ip_lines = [line for line in result.stdout.split('\n') if 'inet ' in line and 'eth0' in line]
-        if ip_lines:
-            local_ip = ip_lines[0].split()[1]
-            return local_ip
-    except Exception as e:
-        print(f"Error getting local IP: {e}")
-    return None
+    local_ip = input("Enter the local IP address: ")
+    return local_ip.strip()
 
 def read_or_generate_server_details():
     local_ip = get_local_ip()
 
-    if local_ip is not None:
+    if local_ip:
         if os.path.exists(DETAILS_FILE_PATH):
             with open(DETAILS_FILE_PATH, 'r') as details_file:
                 details = details_file.readlines()
@@ -37,12 +29,12 @@ def read_or_generate_server_details():
                 details_file.write(f"Encryption Key: {encryption_key.hex()}\n")
             return local_ip, encryption_key
     else:
-        print("Error: Unable to determine local IP.")
+        print("Error: Invalid local IP.")
         return None, None
 
 def run_server_script():
     try:
-        subprocess.run(['python', SERVER_SCRIPT_PATH])
+        os.system(f'python {SERVER_SCRIPT_PATH}')
     except Exception as e:
         print(f"Error running server script: {e}")
 
