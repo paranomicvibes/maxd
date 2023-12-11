@@ -22,6 +22,11 @@ def read_server_details():
         print("Error: Server details file not found.")
         return None, None
 
+def create_activated_clients_file():
+    if not os.path.exists(ACTIVATED_CLIENTS_FILE):
+        with open(ACTIVATED_CLIENTS_FILE, 'w') as file:
+            pass  # Create an empty file
+
 def generate_client_script(uid, server_ip, encryption_key):
     try:
         with open(CLIENT_TEMPLATE, 'r') as template_file:
@@ -50,15 +55,17 @@ def generate_client_script(uid, server_ip, encryption_key):
     except Exception as e:
         print(f"Error generating client script: {e}")
 
+def assign_unique_id():
+    activated_ids = [line.strip() for line in open(ACTIVATED_CLIENTS_FILE, 'r').readlines()]
+    return f"sc{len(activated_ids) + 1}"
+
 def main():
     server_ip, encryption_key = read_server_details()
 
     if server_ip is not None and encryption_key is not None:
-        uid = input("Enter a unique ID for the new client script: ")
-        if uid not in open(ACTIVATED_CLIENTS_FILE).read():
-            generate_client_script(uid, server_ip, encryption_key)
-        else:
-            print(f"Error: UID {uid} is already in use.")
+        create_activated_clients_file()
+        uid = assign_unique_id()
+        generate_client_script(uid, server_ip, encryption_key)
 
 if __name__ == "__main__":
     main()
