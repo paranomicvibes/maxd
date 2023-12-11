@@ -61,4 +61,4 @@ def main():
             print(f"Error: UID {uid} is already in use.")
 
 if __name__ == "__main__":
-    main()￼Enter
+    main()
