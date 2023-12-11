@@ -3,7 +3,7 @@ import subprocess
 from cryptography.fernet import Fernet
 
 DETAILS_FILE_PATH = 'server_details.txt'
-SERVER_SCRIPT_PATH = 'main.py'  # Updated server script name
+SERVER_SCRIPT_PATH = 'main.py'
 
 def generate_encryption_key():
     key = Fernet.generate_key()
@@ -12,9 +12,9 @@ def generate_encryption_key():
 def get_local_ip():
     try:
         result = subprocess.run(['ifconfig'], stdout=subprocess.PIPE, text=True)
-        ip_lines = [line for line in result.stdout.split('\n') if 'IPv4 Address' in line]
+        ip_lines = [line for line in result.stdout.split('\n') if 'inet ' in line and 'eth0' in line]
         if ip_lines:
-            local_ip = ip_lines[0].split(':')[-1].strip()
+            local_ip = ip_lines[0].split()[1]
             return local_ip
     except Exception as e:
         print(f"Error getting local IP: {e}")
