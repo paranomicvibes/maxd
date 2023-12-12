@@ -3,39 +3,21 @@ import subprocess
 import os
 import platform
 import time
-from cryptography.fernet import Fernet
-
-# Replace these placeholders with actual values during activation
-UID = '<UID>'
-SERVER_IP = '<SERVER_IP>'
-ENCRYPTION_KEY = b'<ENCRYPTION_KEY>'
-
-def encrypt_message(message):
-    cipher = Fernet(ENCRYPTION_KEY)
-    encrypted_message = cipher.encrypt(message.encode())
-    return encrypted_message
-
-def decrypt_message(encrypted_message):
-    cipher = Fernet(ENCRYPTION_KEY)
-    decrypted_message = cipher.decrypt(encrypted_message).decode()
-    return decrypted_message
 
 def send_data(data):
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
-            client_socket.connect((SERVER_IP, 8234))
-            encrypted_data = encrypt_message(data)
-            client_socket.sendall(encrypted_data)
+            client_socket.connect(('SERVER_IP', 8234))
+            client_socket.sendall(data.encode())
     except Exception as e:
         print(f"Error sending data: {e}")
 
 def receive_data():
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
-            client_socket.connect((SERVER_IP, 8234))
-            encrypted_data = client_socket.recv(4096)
-            decrypted_data = decrypt_message(encrypted_data)
-            return decrypted_data
+            client_socket.connect(('SERVER_IP', 8234))
+            data = client_socket.recv(4096).decode()
+            return data
     except Exception as e:
         print(f"Error receiving data: {e}")
         return None
